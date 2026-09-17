@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Stay Desk Admin</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f3f4f6;
+    color:#111827
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+
+.login{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:linear-gradient(135deg,#111827,#2563eb)
+}
+.login-box{
+    width:100%;
+    max-width:430px;
+    background:#fff;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,.3)
+}
+.logo{
+    text-align:center;
+    font-size:30px;
+    font-weight:800
+}
+.sub{
+    text-align:center;
+    color:#6b7280;
+    margin:8px 0 25px
+}
+.field{margin-bottom:15px}
+.field label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:6px
+}
+.field input,.field select{
+    width:100%;
+    padding:12px;
+    border:1px solid #d1d5db;
+    border-radius:9px;
+    outline:none
+}
+.field input:focus,.field select:focus{
+    border-color:#2563eb
+}
+.btn{
+    border:0;
+    padding:11px 16px;
+    border-radius:9px;
+    background:#2563eb;
+    color:#fff;
+    font-weight:700
+}
+.btn.green{background:#15803d}
+.btn.red{background:#dc2626}
+.btn.orange{background:#ea580c}
+.btn.gray{background:#6b7280}
+.btn.small{
+    padding:7px 10px;
+    font-size:12px
+}
+.full-btn{
+    width:100%
+}
+.link{
+    color:#2563eb;
+    cursor:pointer;
+    text-align:center;
+    margin-top:15px;
+    font-size:13px
+}
+.alert{
+    padding:12px;
+    border-radius:9px;
+    margin:12px 0;
+    display:none;
+    font-size:13px
+}
+.alert.show{display:block}
+.alert.error{
+    background:#fee2e2;
+    color:#991b1b
+}
+.alert.success{
+    background:#dcfce7;
+    color:#166534
+}
+
+.app{display:none;min-height:100vh}
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:245px;
+    background:#111827;
+    color:white;
+    padding:18px 12px;
+    overflow:auto
+}
+.brand{
+    font-size:23px;
+    font-weight:800;
+    padding:10px;
+    margin-bottom:18px
+}
+.menu{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#d1d5db;
+    padding:12px;
+    border-radius:9px;
+    text-align:left;
+    margin:2px 0
+}
+.menu:hover,.menu.active{
+    background:#2563eb;
+    color:#fff
+}
+.logout{
+    margin-top:20px;
+    background:#991b1b;
+    color:white
+}
+.main{
+    margin-left:245px;
+    padding:20px
+}
+.top{
+    background:#fff;
+    border-radius:14px;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    gap:15px
+}
+.top strong{font-size:18px}
+.search{
+    width:100%;
+    max-width:500px;
+    padding:11px 14px;
+    border:1px solid #ddd;
+    border-radius:9px
+}
+.page{display:none}
+.page.active{display:block}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:15px;
+    margin-bottom:20px
+}
+.card{
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05)
+}
+.card-title{
+    color:#6b7280;
+    font-size:13px
+}
+.card-value{
+    font-size:27px;
+    font-weight:800;
+    margin-top:7px
+}
+.panel{
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05)
+}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px
+}
+.full{grid-column:1/-1}
+
+.table-wrap{
+    overflow-x:auto
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px
+}
+th,td{
+    padding:11px 9px;
+    border-bottom:1px solid #eee;
+    text-align:left;
+    font-size:13px
+}
+th{
+    background:#f8fafc;
+    font-weight:800
+}
+.badge{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700
+}
+.badge.active{
+    background:#dcfce7;
+    color:#166534
+}
+.badge.expired{
+    background:#fee2e2;
+    color:#991b1b
+}
+.badge.inactive{
+    background:#e5e7eb;
+    color:#374151
+}
+.key{
+    font-family:monospace;
+    font-weight:700;
+    letter-spacing:1px
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:1000
+}
+.modal.show{display:flex}
+.modal-box{
+    width:100%;
+    max-width:600px;
+    background:white;
+    border-radius:15px;
+    padding:22px;
+    max-height:90vh;
+    overflow:auto
+}
+
+@media(max-width:800px){
+    .sidebar{
+        position:static;
+        width:100%;
+        height:auto
+    }
+    .main{
+        margin-left:0
+    }
+    .app{display:none}
+    .grid{grid-template-columns:1fr}
+    .full{grid-column:auto}
+    .top{
+        flex-direction:column;
+        align-items:stretch
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginScreen" class="login">
+    <div class="login-box">
+        <div class="logo">🏨 Stay Desk</div>
+        <div class="sub">Administrator Control Panel</div>
+        <div id="loginAlert" class="alert"></div>
+
+        <div class="field">
+            <label>Username / Email</label>
+            <input id="loginUser" type="email" placeholder="Admin Email" value="pareshsolanki633@gmail.com" oninput="adminEmailChanged()">
+        </div>
+
+        <div class="field">
+            <label>Password</label>
+            <input id="loginPass" type="password" placeholder="Enter password" value="admin123">
+        </div>
+
+        <div id="emailSyncStatus" style="font-size:13px;margin:8px 0;text-align:center;"></div><button class="btn full-btn" onclick="adminLogin()">LOGIN</button>
+        <div class="link" onclick="showForgot()">Forgot Password?</div>
+        <button class="btn" style="width:100%;margin-top:10px;background:#6b7280" onclick="resetAdminLogin()">Reset Demo Admin Login</button>
+
+        <p style="text-align:center;color:#888;font-size:11px;margin-top:20px">
+            Stay Desk Admin • Prototype
+        </p>
+    </div>
+</div>
+
+<!-- ================= FORGOT PASSWORD ================= -->
+
+<div id="forgotScreen" class="login" style="display:none">
+    <div class="login-box">
+        <div class="logo">🔐 Password Recovery</div>
+        <div class="sub">Admin account recovery</div>
+        <div id="forgotAlert" class="alert"></div>
+
+        <div class="field">
+            <label>Registered Admin Email</label>
+            <input id="forgotEmail" placeholder="admin@staydesk.local">
+        </div>
+
+        <button class="btn full-btn" onclick="forgotPassword()">SEND RECOVERY</button>
+        <div class="link" onclick="backToLogin()">← Back to Login</div>
+    </div>
+</div>
+
+<!-- ================= ADMIN APP ================= -->
+
+<div id="app" class="app">
+<aside class="sidebar">
+    <div class="brand">🏨 Stay Desk</div>
+    <button class="menu active" onclick="showPage('dashboard',this)">📊 Dashboard</button>
+    <button class="menu" onclick="showPage('hotels',this)">🏨 Hotels</button>
+    <button class="menu" onclick="showPage('licenses',this)">🔑 Licenses</button>
+    <button class="menu" onclick="showPage('logs',this)">📋 Activity Logs</button>
+    <button class="menu" onclick="showPage('settings',this)">⚙️ Admin Settings</button>
+    <button class="menu logout" onclick="adminLogout()">Logout</button>
+</aside>
+
+<div id="masterSyncStatus" style="position:fixed;top:10px;right:12px;z-index:9999;padding:7px 10px;border-radius:20px;background:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,.12);font-size:12px;font-weight:600;">● License Master: Checking...</div>
+
+<main class="main">
+<div class="top">
+    <input class="search" id="hotelSearch" placeholder="Search Hotel ID / Hotel Name / Mobile..." oninput="renderHotels()">
+    <strong>Admin Control Panel</strong>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="page active">
+    <h1>Dashboard</h1>
+    <div class="cards">
+        <div class="card">
+            <div class="card-title">Total Hotels</div>
+            <div class="card-value" id="totalHotels">0</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Active Hotels</div>
+            <div class="card-value" id="activeHotels">0</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Expired Hotels</div>
+            <div class="card-value" id="expiredHotels">0</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Inactive Hotels</div>
+            <div class="card-value" id="inactiveHotels">0</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Quick Actions</h2>
+        <button class="btn" onclick="openAddHotel()">+ Add New Hotel</button>
+        <button class="btn green" onclick="showPage('hotels')">Hotel List</button>
+        <button class="btn orange" onclick="showPage('licenses')">License Management</button>
+    </div>
+</section>
+
+<!-- ================= HOTELS ================= -->
+
+<section id="hotels" class="page">
+    <h1>Hotel Management</h1>
+    <div class="panel">
+        <button class="btn" onclick="openAddHotel()">+ Register New Hotel</button>
+    </div>
+
+    <div class="panel table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Hotel ID</th>
+                    <th>Hotel Name</th>
+                    <th>Mobile</th>
+                    <th>Plan</th>
+                    <th>Start</th>
+                    <th>Expiry</th>
+                    <th>Status</th>
+                    <th>Activation Key</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="hotelTable"></tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ================= LICENSE ================= -->
+
+<section id="licenses" class="page">
+    <h1>🔑 License Management</h1>
+    <div class="panel">
+        <h2>Subscription Plans</h2>
+        <div class="cards">
+            <div class="card">
+                <div class="card-title">Monthly</div>
+                <div class="card-value">₹500</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Yearly</div>
+                <div class="card-value">₹4,500</div>
+            </div>
+            <div class="card">
+                <div class="card-title">2 Years</div>
+                <div class="card-value">₹8,000</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>License Rules</h2>
+        <p>✔ Every hotel gets a unique Hotel ID.</p>
+        <p>✔ Every hotel gets a unique Activation Key.</p>
+        <p>✔ Subscription has start and expiry date.</p>
+        <p>✔ Admin can deactivate a hotel.</p>
+        <p>✔ Expired license should block hotel software.</p>
+        <p>✔ Hotel data should remain preserved after expiry.</p>
+        <p>✔ Final online version will verify license with server.</p>
+    </div>
+</section>
+
+<!-- ================= LOGS ================= -->
+
+<section id="logs" class="page">
+    <h1>📋 Activity Logs</h1>
+    <div class="panel table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date / Time</th>
+                    <th>Action</th>
+                    <th>Hotel ID</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="logTable"></tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+
+<section id="settings" class="page">
+    <h1>⚙️ Admin Settings</h1>
+    <div class="panel">
+        <h2>Admin Account</h2>
+        <div id="settingsAlert" class="alert"></div>
+        <div class="grid">
+            <div class="field">
+                <label>Admin Username</label>
+                <input id="adminUsername">
+            </div>
+            <div class="field">
+                <label>Admin Email</label>
+                <input id="adminEmail">
+            </div>
+            <div class="field">
+                <label>New Password</label>
+                <input id="newPassword" type="password">
+            </div>
+            <div class="field">
+                <label>Confirm Password</label>
+                <input id="confirmPassword" type="password">
+            </div>
+        </div>
+        <button class="btn green" onclick="saveAdminSettings()">Save Admin Settings</button>
+    </div>
+</section>
+
+</main>
+</div>
+
+<!-- ================= HOTEL MODAL ================= -->
+
+<div id="hotelModal" class="modal">
+    <div class="modal-box">
+        <h2>Register Hotel</h2>
+        <div id="hotelAlert" class="alert"></div>
+        <div class="grid">
+            <div class="field">
+                <label>Hotel Name *</label>
+                <input id="newHotelName">
+            </div>
+            <div class="field">
+                <label>Mobile *</label>
+                <input id="newHotelMobile">
+            </div>
+            <div class="field">
+                <label>Email</label>
+                <input id="newHotelEmail">
+            </div>
+            <div class="field">
+                <label>Plan</label>
+                <select id="newHotelPlan" onchange="updateExpiryPreview()">
+                    <option value="Monthly">Monthly - ₹500</option>
+                    <option value="Yearly">Yearly - ₹4500</option>
+                    <option value="2 Years">2 Years - ₹8000</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Subscription Start</label>
+                <input id="newHotelStart" type="date" onchange="updateExpiryPreview()">
+            </div>
+            <div class="field">
+                <label>Subscription Expiry</label>
+                <input id="newHotelExpiry" type="date" readonly>
+            </div>
+            <div class="field full">
+                <label>Hotel Address</label>
+                <input id="newHotelAddress">
+            </div>
+        </div>
+        <br>
+        <button class="btn green" onclick="registerHotel()">CREATE HOTEL LICENSE</button>
+        <button class="btn gray" onclick="closeHotelModal()">Cancel</button>
+    </div>
+</div>
+
+<script>
+/* =====================================================
+   GOOGLE SCRIPT CONFIG
+===================================================== */
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzo25_FOzZpiPn2bFOlR8q9ophJEv8oiXNfEJZeF4KZH51KdvfOlC_u2-pqG4pMYHsF/exec";
+
+/* =====================================================
+   MASTER LICENSE SYNC
+   Google Sheet is the license master.
+   Hotel operational data remains local to this device.
+===================================================== */
+function loadHotelsFromSheet(){
+    return new Promise((resolve)=>{
+        const cb = "stayDeskAdminCB_" + Date.now();
+        const script = document.createElement("script");
+        const cleanup = ()=>{
+            try{ delete window[cb]; }catch(e){}
+            if(script.parentNode) script.parentNode.removeChild(script);
+        };
+        const timer = setTimeout(()=>{
+            cleanup();
+            resolve(false);
+        },10000);
+
+        window[cb] = function(data){
+            clearTimeout(timer);
+            cleanup();
+            if(data && data.success !== false){
+                const hotels = Array.isArray(data.hotels) ? data.hotels :
+                               Array.isArray(data.data) ? data.data : [];
+                if(hotels.length || data.hotels){
+                    db.hotels = hotels.map(h=>({
+                        hotelId: h.hotelId || h.hotelID || "",
+                        hotelName: h.hotelName || "",
+                        mobile: h.mobile || "",
+                        email: h.email || "",
+                        plan: h.plan || "",
+                        startDate: h.startDate || "",
+                        expiryDate: h.expiryDate || "",
+                        address: h.address || "",
+                        status: h.status || "",
+                        activationKey: h.activationKey || "",
+                        createdAt: h.createdAt || ""
+                    }));
+                    saveDB();
+                }
+                renderDashboard();
+                renderHotels();
+                resolve(true);
+            }else{
+                resolve(false);
+            }
+        };
+
+        const url = GOOGLE_SCRIPT_URL + "?action=list&callback=" + encodeURIComponent(cb) + "&_=" + Date.now();
+        script.src = url;
+        script.onerror = ()=>{ clearTimeout(timer); cleanup(); resolve(false); };
+        document.head.appendChild(script);
+    });
+}
+
+async function syncLicenseMaster(){
+    const ok = await loadHotelsFromSheet();
+    const el = document.getElementById("masterSyncStatus");
+    if(el){
+        el.textContent = ok ? "● License Master: Connected" : "● License Master: Offline / Cached";
+        el.title = ok ? "Google Sheet license data is synced" : "Using the last saved local cache";
+    }
+    if(!ok) console.log("License master sync unavailable; keeping local admin cache.");
+    return ok;
+}
+
+// Phone-change safe behavior: the license list is refreshed from Google Sheet
+// whenever Admin opens the app and periodically while it remains open.
+let stayDeskSyncTimer = null;
+function startMasterAutoSync(){
+    if(stayDeskSyncTimer) clearInterval(stayDeskSyncTimer);
+    stayDeskSyncTimer = setInterval(()=>{
+        if(document.visibilityState === "visible") syncLicenseMaster();
+    }, 5 * 60 * 1000);
+}
+
+
+/* =====================================================
+   DATABASE
+===================================================== */
+const DB_KEY = "stayDeskAdminFinalV1";
+const DEFAULT_ADMIN = { username:"admin", email:"admin@staydesk.local", password:"admin123" };
+
+let db;
+try {
+    db = JSON.parse(localStorage.getItem(DB_KEY) || "null");
+} catch(e) { db = null; }
+
+if(!db || typeof db !== "object") db = {};
+if(!db.admin || typeof db.admin !== "object") db.admin = {...DEFAULT_ADMIN};
+if(!Array.isArray(db.hotels)) db.hotels = [];
+if(!Array.isArray(db.logs)) db.logs = [];
+
+try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(e) {}
+
+function resetAdminLogin(){
+    db.admin = {...DEFAULT_ADMIN};
+    saveDB();
+    document.getElementById("loginUser").value = "admin";
+    document.getElementById("loginPass").value = "admin123";
+    alert("Admin login reset to admin / admin123");
+}
+
+function saveDB(){
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
+}
+
+function message(id,text,type){
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.className="alert show "+type;
+    el.innerText=text;
+    setTimeout(()=>{ el.className="alert"; },3500);
+}
+
+function today(){
+    return new Date().toISOString().split("T")[0];
+}
+
+function calculateExpiry(start,plan){
+    const d=new Date(start+"T00:00:00");
+    if(plan==="Monthly") d.setMonth(d.getMonth()+1);
+    if(plan==="Yearly") d.setFullYear(d.getFullYear()+1);
+    if(plan==="2 Years") d.setFullYear(d.getFullYear()+2);
+    return d.toISOString().split("T")[0];
+}
+
+function generateKey(){
+    const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let key="SD-";
+    for(let i=0;i<12;i++){
+        if(i===4 || i===8) key+="-";
+        key+=chars[Math.floor(Math.random()*chars.length)];
+    }
+    return key;
+}
+
+function generateHotelId(){
+    let id;
+    do{
+        id="SDH-"+Math.floor(100000+Math.random()*900000);
+    }while(db.hotels.some(h=>h.hotelId===id));
+    return id;
+}
+
+function addLog(action,hotelId,details){
+    db.logs.push({
+        id:Date.now(),
+        date:new Date().toLocaleString("en-IN"),
+        action,
+        hotelId:hotelId || "-",
+        details
+    });
+}
+
+function adminEmailChanged(){
+    const email = document.getElementById("loginUser").value.trim().toLowerCase();
+    const status = document.getElementById("emailSyncStatus");
+    if(email === "pareshsolanki633@gmail.com"){
+        status.textContent = "✓ Admin email recognized — syncing license master…";
+        syncLicenseMaster().then(()=>{
+            status.textContent = "✓ License master synced";
+        });
+    }else{
+        status.textContent = "";
+    }
+}
+
+function adminLogin(){
+    const user = document.getElementById("loginUser").value.trim().toLowerCase();
+    const pass = document.getElementById("loginPass").value;
+
+    if(user !== "pareshsolanki633@gmail.com"){
+        message("loginAlert","Use the registered StayDesk Admin email.","error");
+        return;
+    }
+
+    if(pass === "admin123"){
+        sessionStorage.setItem("stayDeskAdminLogin","1");
+        sessionStorage.setItem("stayDeskAdminEmail", user);
+        addLog("ADMIN LOGIN","-","Administrator logged in");
+        saveDB();
+        document.getElementById("loginScreen").style.display="none";
+        document.getElementById("app").style.display="block";
+        renderDashboard();
+        renderHotels();
+        renderLogs();
+        syncLicenseMaster();
+        startMasterAutoSync();
+    } else {
+        message("loginAlert","Invalid password.","error");
+    }
+}
+
+function adminLogout(){
+    sessionStorage.removeItem("stayDeskAdminLogin");
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginScreen").style.display="flex";
+}
+
+function openAddHotel(){
+    document.getElementById("newHotelName").value="";
+    document.getElementById("newHotelMobile").value="";
+    document.getElementById("newHotelEmail").value="";
+    document.getElementById("newHotelPlan").value="Monthly";
+    document.getElementById("newHotelStart").value=today();
+    document.getElementById("newHotelAddress").value="";
+    updateExpiryPreview();
+    document.getElementById("hotelModal").classList.add("show");
+}
+
+function closeHotelModal(){
+    document.getElementById("hotelModal").classList.remove("show");
+}
+
+function updateExpiryPreview(){
+    const start=document.getElementById("newHotelStart").value;
+    const plan=document.getElementById("newHotelPlan").value;
+    if(start){
+        document.getElementById("newHotelExpiry").value=calculateExpiry(start,plan);
+    }
+}
+
+async function registerHotel(){
+    const name=document.getElementById("newHotelName").value.trim();
+    const mobile=document.getElementById("newHotelMobile").value.trim();
+    const email=document.getElementById("newHotelEmail").value.trim();
+    const plan=document.getElementById("newHotelPlan").value;
+    const start=document.getElementById("newHotelStart").value;
+    const expiry=document.getElementById("newHotelExpiry").value;
+    const address=document.getElementById("newHotelAddress").value.trim();
+
+    if(!name || !mobile || !start){
+        message("hotelAlert","Please fill required fields (Name, Mobile, Start Date)","error");
+        return;
+    }
+
+    const hotelId=generateHotelId();
+    const key=generateKey();
+
+    const newHotel={
+        hotelId, hotelName:name, mobile, email, plan,
+        startDate:start, expiryDate:expiry, address,
+        status:"Active", activationKey:key, createdAt:new Date().toISOString()
+    };
+
+    db.hotels.push(newHotel);
+    addLog("CREATE HOTEL",hotelId,"Registered "+name);
+    saveDB();
+
+    message("hotelAlert","Saving to Google Sheet...","success");
+
+    try {
+        const queryParams = new URLSearchParams({
+            action: "register",
+            hotelId: hotelId,
+            hotelName: name,
+            mobile: mobile,
+            email: email,
+            plan: plan,
+            startDate: start,
+            expiryDate: expiry,
+            address: address,
+            activationKey: key
+        });
+
+        await fetch(GOOGLE_SCRIPT_URL + "?" + queryParams.toString(), { method: "GET", mode: "no-cors" });
+    } catch(e) {
+        console.log("Sheet sync note:", e);
+    }
+
+    closeHotelModal();
+    renderDashboard();
+    renderHotels();
+    renderLogs();
+    alert("Hotel Registered Successfully!\nHotel ID: " + hotelId + "\nKey: " + key);
+}
+
+function renderDashboard(){
+    document.getElementById("totalHotels").innerText = db.hotels.length;
+    document.getElementById("activeHotels").innerText = db.hotels.filter(h => h.status === "Active").length;
+    document.getElementById("expiredHotels").innerText = db.hotels.filter(h => h.status === "Expired").length;
+    document.getElementById("inactiveHotels").innerText = db.hotels.filter(h => h.status === "Inactive").length;
+}
+
+function renderHotels(){
+    const query = (document.getElementById("hotelSearch").value || "").toLowerCase();
+    const tbody = document.getElementById("hotelTable");
+    tbody.innerHTML = "";
+
+    const filtered = db.hotels.filter(h => 
+        h.hotelId.toLowerCase().includes(query) ||
+        h.hotelName.toLowerCase().includes(query) ||
+        h.mobile.includes(query)
+    );
+
+    if(filtered.length === 0){
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#6b7280;">No hotels found</td></tr>`;
+        return;
+    }
+
+    filtered.forEach(h => {
+        tbody.innerHTML += `
+            <tr>
+                <td><b>${h.hotelId}</b></td>
+                <td>${h.hotelName}</td>
+                <td>${h.mobile}</td>
+                <td>${h.plan}</td>
+                <td>${h.startDate}</td>
+                <td>${h.expiryDate}</td>
+                <td><span class="badge ${h.status.toLowerCase()}">${h.status}</span></td>
+                <td><span class="key">${h.activationKey}</span></td>
+                <td>
+                    <button class="btn small red" onclick="deleteHotel('${h.hotelId}')">Deactivate</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+async function deleteHotel(id){
+    if(!confirm("Deactivate hotel " + id + "? The hotel data will be preserved.")) return;
+
+    try{
+        const url = GOOGLE_SCRIPT_URL +
+            "?action=update&hotelId=" + encodeURIComponent(id) +
+            "&status=Inactive&callback=stayDeskAdminUpdateCB";
+        await new Promise((resolve)=>{
+            const s=document.createElement("script");
+            window.stayDeskAdminUpdateCB=function(){ resolve(); try{delete window.stayDeskAdminUpdateCB;}catch(e){} s.remove(); };
+            s.onerror=()=>{resolve(); try{delete window.stayDeskAdminUpdateCB;}catch(e){} s.remove();};
+            s.src=url;
+            document.head.appendChild(s);
+        });
+    }catch(e){ console.log(e); }
+
+    const h=db.hotels.find(x=>x.hotelId===id);
+    if(h) h.status="Inactive";
+    addLog("DEACTIVATE HOTEL",id,"Hotel license deactivated");
+    saveDB();
+    renderDashboard();
+    renderHotels();
+    renderLogs();
+}
+
+function renderLogs(){
+    const tbody = document.getElementById("logTable");
+    tbody.innerHTML = "";
+    db.logs.slice().reverse().forEach(l => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${l.date}</td>
+                <td><b>${l.action}</b></td>
+                <td>${l.hotelId}</td>
+                <td>${l.details}</td>
+            </tr>
+        `;
+    });
+}
+
+function showPage(pageId, btnEl){
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(pageId).classList.add("active");
+    if(btnEl){
+        document.querySelectorAll(".sidebar .menu").forEach(m => m.classList.remove("active"));
+        btnEl.classList.add("active");
+    }
+    if(pageId === 'dashboard') renderDashboard();
+    if(pageId === 'hotels') renderHotels();
+    if(pageId === 'logs') renderLogs();
+}
+
+function showForgot(){
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("forgotScreen").style.display="flex";
+}
+
+function backToLogin(){
+    document.getElementById("forgotScreen").style.display="none";
+    document.getElementById("loginScreen").style.display="flex";
+}
+
+function forgotPassword(){
+    alert("Demo Admin Password is: admin123");
+    backToLogin();
+}
+
+function saveAdminSettings(){
+    message("settingsAlert","Admin settings updated successfully!","success");
+}
+</script>
+</body>
+</html>
